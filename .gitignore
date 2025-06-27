@@ -218,3 +218,6 @@ mise.toml
 # Docker customizations
 docker/certbot/conf/
 docker/backups/
+docker/.env
+docker/nginx/ssl/
+docker/volumes/
