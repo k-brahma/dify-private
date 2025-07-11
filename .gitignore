@@ -221,3 +221,6 @@ docker/backups/
 docker/.env
 docker/nginx/ssl/
 docker/volumes/
+
+# API env backup
+api/.env.backup

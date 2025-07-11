@@ -184,9 +184,11 @@ const VarReferencePicker: FC<Props> = ({
       return startNode?.data
 
     const node = getNodeInfoById(availableNodes, outputVarNodeId)?.data
-    return {
-      ...node,
-      id: outputVarNodeId,
+    if (node) {
+      return {
+        ...node,
+        id: outputVarNodeId,
+      }
     }
   }, [value, hasValue, isConstant, isIterationVar, iterationNode, availableNodes, outputVarNodeId, startNode, isLoopVar, loopNode])
 
@@ -526,6 +528,7 @@ const VarReferencePicker: FC<Props> = ({
               onChange={handleVarReferenceChange}
               itemWidth={isAddBtnTrigger ? 260 : (minWidth || triggerWidth)}
               isSupportFileVar={isSupportFileVar}
+              zIndex={zIndex}
             />
           )}
         </PortalToFollowElemContent>
