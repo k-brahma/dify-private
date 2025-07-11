@@ -1,7 +1,7 @@
 """add account mfa settings table
 
-Revision ID: abc123def456
-Revises: 0ab65e1cc7fa
+Revision ID: 924752d42eb7
+Revises: 58eb7bdb93fe
 Create Date: 2025-07-08 15:00:00.000000
 
 """
@@ -11,8 +11,8 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'abc123def456'
-down_revision = '0ab65e1cc7fa'
+revision = '924752d42eb7'
+down_revision = '58eb7bdb93fe'
 branch_labels = None
 depends_on = None
 

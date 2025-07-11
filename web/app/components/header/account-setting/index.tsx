@@ -23,6 +23,9 @@ import Button from '../../base/button'
 import MembersPage from './members-page'
 import LanguagePage from './language-page'
 import MFAPage from './mfa-page'
+
+// Debug: Check if MFAPage is imported correctly
+console.log('MFAPage component:', MFAPage)
 import ApiBasedExtensionPage from './api-based-extension-page'
 import DataSourcePage from './data-source-page'
 import ModelProviderPage from './model-provider-page'
@@ -34,6 +37,7 @@ import { useProviderContext } from '@/context/provider-context'
 import { useAppContext } from '@/context/app-context'
 import MenuDialog from '@/app/components/header/account-setting/menu-dialog'
 import Input from '@/app/components/base/input'
+import { useGlobalPublicStore } from '@/context/global-public-context'
 
 const iconClassName = `
   w-5 h-5 mr-2
@@ -60,6 +64,13 @@ export default function AccountSetting({
   const { t } = useTranslation()
   const { enableBilling, enableReplaceWebAppLogo } = useProviderContext()
   const { isCurrentWorkspaceDatasetOperator } = useAppContext()
+  
+  // Debug: Check user role and context
+  console.log('AccountSetting Debug:', {
+    isCurrentWorkspaceDatasetOperator,
+    activeTab,
+    activeMenu
+  })
 
   const workplaceGroupItems = (() => {
     if (isCurrentWorkspaceDatasetOperator)
@@ -134,6 +145,10 @@ export default function AccountSetting({
       ],
     },
   ]
+  
+  // Debug: Log menuItems to see what's being rendered
+  console.log('MenuItems:', menuItems)
+  console.log('Account group items:', menuItems[1].items)
   const scrollRef = useRef<HTMLDivElement>(null)
   const [scrolled, setScrolled] = useState(false)
   useEffect(() => {
@@ -162,14 +177,22 @@ export default function AccountSetting({
           <div className='title-2xl-semi-bold mb-8 mt-6 px-3 py-2 text-text-primary'>{t('common.userProfile.settings')}</div>
           <div className='w-full'>
             {
-              menuItems.map(menuItem => (
+              menuItems.map(menuItem => {
+                console.log('Rendering menu group:', menuItem.key, 'items:', menuItem.items.length)
+                return (
                 <div key={menuItem.key} className='mb-2'>
                   {!isCurrentWorkspaceDatasetOperator && (
                     <div className='system-xs-medium-uppercase mb-0.5 py-2 pb-1 pl-3 text-text-tertiary'>{menuItem.name}</div>
                   )}
+                  {/* Debug: Show group name even for dataset operators */}
+                  {isCurrentWorkspaceDatasetOperator && menuItem.key === 'account-group' && (
+                    <div className='system-xs-medium-uppercase mb-0.5 py-2 pb-1 pl-3 text-text-tertiary'>[DEBUG] {menuItem.name}</div>
+                  )}
                   <div>
                     {
-                      menuItem.items.map(item => (
+                      menuItem.items.map(item => {
+                        console.log('Rendering menu item:', item.key, item.name)
+                        return (
                         <div
                           key={item.key}
                           className={cn(
@@ -184,11 +207,11 @@ export default function AccountSetting({
                           {activeMenu === item.key ? item.activeIcon : item.icon}
                           {!isMobile && <div className='truncate'>{item.name}</div>}
                         </div>
-                      ))
+                      )})
                     }
                   </div>
                 </div>
-              ))
+              )})
             }
           </div>
         </div>
@@ -233,7 +256,12 @@ export default function AccountSetting({
               {activeMenu === 'data-source' && <DataSourcePage />}
               {activeMenu === 'api-based-extension' && <ApiBasedExtensionPage />}
               {activeMenu === 'custom' && <CustomPage />}
-              {activeMenu === 'mfa' && <MFAPage />}
+              {activeMenu === 'mfa' && (
+                <>
+                  {console.log('Rendering MFA Page')}
+                  <MFAPage />
+                </>
+              )}
               {activeMenu === 'language' && <LanguagePage />}
             </div>
           </div>

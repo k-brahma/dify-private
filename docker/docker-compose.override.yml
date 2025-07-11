@@ -8,6 +8,9 @@ services:
   
   # Configure web service for nginx-proxy
   web:
+    build:
+      context: ../web
+      dockerfile: Dockerfile
     expose:
       - "3000"
     networks:
@@ -16,12 +19,24 @@ services:
   
   # Configure api service for nginx-proxy  
   api:
+    build:
+      context: ../api
+      dockerfile: Dockerfile
     expose:
       - "5001"
     networks:
       - dify-network
       - default
   
+  # Configure worker service
+  worker:
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+    networks:
+      - dify-network
+      - default
+      
   # Configure plugin daemon for nginx-proxy
   plugin_daemon:
     expose:

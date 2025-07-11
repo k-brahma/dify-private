@@ -30,10 +30,10 @@ export default function Modal({
 }: IModal) {
   return (
     <Transition appear show={isShow} as={Fragment}>
-      <Dialog as="div" className={classNames('relative z-[70]', wrapperClassName)} onClose={onClose} onMouseOver={() => console.log('Modal Dialog hover')}>
+      <Dialog as="div" className={classNames('relative z-[70]', wrapperClassName)} onClose={onClose}>
         <TransitionChild>
           <div className={classNames(
-            'fixed inset-0 bg-background-overlay bg-red-500/30', // DEBUG: Red overlay
+            'fixed inset-0 bg-background-overlay',
             'duration-300 ease-in data-[closed]:opacity-0',
             'data-[enter]:opacity-100',
             'data-[leave]:opacity-0',
@@ -41,14 +41,9 @@ export default function Modal({
         </TransitionChild>
 
         <div
-          className="fixed inset-0 overflow-y-auto border-8 border-blue-500" // DEBUG: Blue border
-          onMouseOver={() => console.log('Modal content wrapper hover')}
-          onClick={(e) => {
-            console.log('Modal content wrapper clicked');
-            e.stopPropagation();
-          }}
+          className="fixed inset-0 overflow-y-auto"
         >
-          <div className="flex min-h-full items-center justify-center p-4 text-center bg-green-500/20" onMouseOver={() => console.log('Modal center div hover')}> {/* DEBUG: Green */}
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
             <TransitionChild>
               <DialogPanel className={classNames(
                 'w-full max-w-[480px] transform rounded-2xl bg-components-panel-bg p-6 text-left align-middle shadow-xl transition-all',
