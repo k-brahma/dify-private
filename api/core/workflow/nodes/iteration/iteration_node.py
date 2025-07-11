@@ -1,5 +1,6 @@
 import contextvars
 import logging
+import time
 import uuid
 from collections.abc import Generator, Mapping, Sequence
 from concurrent.futures import Future, wait
@@ -11,6 +12,7 @@ from flask import Flask, current_app
 
 from configs import dify_config
 from core.variables import ArrayVariable, IntegerVariable, NoneVariable
+from core.variables.segments import ArrayAnySegment, ArraySegment
 from core.workflow.entities.node_entities import (
     NodeRunResult,
 )
@@ -37,6 +39,7 @@ from core.workflow.nodes.base import BaseNode
 from core.workflow.nodes.enums import NodeType
 from core.workflow.nodes.event import NodeEvent, RunCompletedEvent
 from core.workflow.nodes.iteration.entities import ErrorHandleMode, IterationNodeData
+from factories.variable_factory import build_segment
 from libs.flask_utils import preserve_flask_contexts
 
 from .exc import (
@@ -72,6 +75,10 @@ class IterationNode(BaseNode[IterationNodeData]):
             },
         }
 
+    @classmethod
+    def version(cls) -> str:
+        return "1"
+
     def _run(self) -> Generator[NodeEvent | InNodeEvent, None, None]:
         """
         Run the node.
@@ -85,10 +92,17 @@ class IterationNode(BaseNode[IterationNodeData]):
             raise InvalidIteratorValueError(f"invalid iterator value: {variable}, please provide a list.")
 
         if isinstance(variable, NoneVariable) or len(variable.value) == 0:
+            # Try our best to preserve the type informat.
+            if isinstance(variable, ArraySegment):
+                output = variable.model_copy(update={"value": []})
+            else:
+                output = ArrayAnySegment(value=[])
             yield RunCompletedEvent(
                 run_result=NodeRunResult(
                     status=WorkflowNodeExecutionStatus.SUCCEEDED,
-                    outputs={"output": []},
+                    # TODO(QuantumGhost): is it possible to compute the type of `output`
+                    # from graph definition?
+                    outputs={"output": output},
                 )
             )
             return
@@ -120,7 +134,10 @@ class IterationNode(BaseNode[IterationNodeData]):
         variable_pool.add([self.node_id, "item"], iterator_list_value[0])
 
         # init graph engine
+        from core.workflow.graph_engine.entities.graph_runtime_state import GraphRuntimeState
         from core.workflow.graph_engine.graph_engine import GraphEngine, GraphEngineThreadPool
+
+        graph_runtime_state = GraphRuntimeState(variable_pool=variable_pool, start_at=time.perf_counter())
 
         graph_engine = GraphEngine(
             tenant_id=self.tenant_id,
@@ -133,7 +150,7 @@ class IterationNode(BaseNode[IterationNodeData]):
             call_depth=self.workflow_call_depth,
             graph=iteration_graph,
             graph_config=graph_config,
-            variable_pool=variable_pool,
+            graph_runtime_state=graph_runtime_state,
             max_execution_steps=dify_config.WORKFLOW_MAX_EXECUTION_STEPS,
             max_execution_time=dify_config.WORKFLOW_MAX_EXECUTION_TIME,
             thread_pool_id=self.thread_pool_id,
@@ -231,6 +248,7 @@ class IterationNode(BaseNode[IterationNodeData]):
             # Flatten the list of lists
             if isinstance(outputs, list) and all(isinstance(output, list) for output in outputs):
                 outputs = [item for sublist in outputs for item in sublist]
+            output_segment = build_segment(outputs)
 
             yield IterationRunSucceededEvent(
                 iteration_id=self.id,
@@ -247,7 +265,7 @@ class IterationNode(BaseNode[IterationNodeData]):
             yield RunCompletedEvent(
                 run_result=NodeRunResult(
                     status=WorkflowNodeExecutionStatus.SUCCEEDED,
-                    outputs={"output": outputs},
+                    outputs={"output": output_segment},
                     metadata={
                         WorkflowNodeExecutionMetadataKey.ITERATION_DURATION_MAP: iter_run_map,
                         WorkflowNodeExecutionMetadataKey.TOTAL_TOKENS: graph_engine.graph_runtime_state.total_tokens,

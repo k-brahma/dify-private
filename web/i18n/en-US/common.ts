@@ -463,6 +463,7 @@ const translation = {
       connected: 'Connected',
       disconnected: 'Disconnected',
       changeAuthorizedPages: 'Change authorized pages',
+      integratedAlert: 'Notion is integrated via internal credential, no need to re-authorize.',
       pagesAuthorized: 'Pages authorized',
       sync: 'Sync',
       remove: 'Remove',

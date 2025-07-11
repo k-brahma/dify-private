@@ -31,6 +31,7 @@ type NodesExtraData = {
   getAvailablePrevNodes: (isChatMode: boolean) => BlockEnum[]
   getAvailableNextNodes: (isChatMode: boolean) => BlockEnum[]
   checkValid: any
+  defaultRunInputData?: Record<string, any>
 }
 export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
   [BlockEnum.Start]: {
@@ -68,6 +69,7 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     getAvailablePrevNodes: LLMDefault.getAvailablePrevNodes,
     getAvailableNextNodes: LLMDefault.getAvailableNextNodes,
     checkValid: LLMDefault.checkValid,
+    defaultRunInputData: LLMDefault.defaultRunInputData,
   },
   [BlockEnum.KnowledgeRetrieval]: {
     author: 'Dify',
@@ -478,6 +480,10 @@ export const LLM_OUTPUT_STRUCT: Var[] = [
     variable: 'text',
     type: VarType.string,
   },
+  {
+    variable: 'usage',
+    type: VarType.object,
+  },
 ]
 
 export const KNOWLEDGE_RETRIEVAL_OUTPUT_STRUCT: Var[] = [
@@ -498,6 +504,10 @@ export const QUESTION_CLASSIFIER_OUTPUT_STRUCT = [
   {
     variable: 'class_name',
     type: VarType.string,
+  },
+  {
+    variable: 'usage',
+    type: VarType.object,
   },
 ]
 
@@ -543,6 +553,10 @@ export const PARAMETER_EXTRACTOR_COMMON_STRUCT: Var[] = [
   {
     variable: '__reason',
     type: VarType.string,
+  },
+  {
+    variable: '__usage',
+    type: VarType.object,
   },
 ]
 
