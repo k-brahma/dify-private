@@ -214,4 +214,13 @@ mise.toml
 
 # AI Assistant
 .roo/
+
+# Docker customizations
+docker/certbot/conf/
+docker/backups/
+docker/.env
+docker/nginx/ssl/
+docker/volumes/
+
+# API env backup
 api/.env.backup

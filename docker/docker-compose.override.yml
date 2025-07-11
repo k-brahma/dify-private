@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # Disable the built-in nginx service
+  nginx:
+    profiles:
+      - disabled
+  
+  # Configure web service for nginx-proxy
+  web:
+    expose:
+      - "3000"
+    networks:
+      - dify-network
+      - default
+  
+  # Configure api service for nginx-proxy  
+  api:
+    expose:
+      - "5001"
+    networks:
+      - dify-network
+      - default
+  
+  # Configure plugin daemon for nginx-proxy
+  plugin_daemon:
+    expose:
+      - "5002"
+    networks:
+      - dify-network
+      - default
+
+networks:
+  dify-network:
+    external: true
