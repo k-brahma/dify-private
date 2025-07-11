@@ -30,7 +30,7 @@ export default function Modal({
 }: IModal) {
   return (
     <Transition appear show={isShow} as={Fragment}>
-      <Dialog as="div" className={classNames('relative z-[60]', wrapperClassName)} onClose={onClose}>
+      <Dialog as="div" className={classNames('relative z-[70]', wrapperClassName)} onClose={onClose}>
         <TransitionChild>
           <div className={classNames(
             'fixed inset-0 bg-background-overlay',
@@ -42,10 +42,6 @@ export default function Modal({
 
         <div
           className="fixed inset-0 overflow-y-auto"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}
         >
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <TransitionChild>
